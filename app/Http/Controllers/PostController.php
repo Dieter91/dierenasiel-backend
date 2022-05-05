@@ -39,7 +39,7 @@ class PostController extends Controller
         $post->slug = $request->slug;
         $post->title = $request->title;
         $post->content = $request->content;
-        $post->img = $request->file('img')->store('posts', 'public');
+        $post->img = 'storage/' . $request->file('img')->store('posts', 'public');
         $result = $post->save();
 
         if ($result) {
