@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 
 class PostController extends Controller
 {
@@ -87,6 +88,10 @@ class PostController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $post = Post::find($id);
+        $imagePath = public_path('storage\\' . $post->img);
+        File::delete($imagePath);
+        // $post->delete();
+        return 'success';
     }
 }

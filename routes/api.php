@@ -22,12 +22,19 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 //protected
 Route::group(['middleware' => ['auth:sanctum']], function () {
+    //POSTS
     Route::post('/posts', [PostController::class, 'store']);
+    Route::delete('/posts/{id}', [PostController::class, 'destroy']);
+    //AUTH
     Route::post('/logout', [AuthController::class, 'logout']);
 });
 
 //public routes
+
+//POST ROUTES
 Route::get('/posts', [PostController::class, 'index']);
 Route::get('/posts/{slug}', [PostController::class, 'show']);
+
+//AUTH ROUTES
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
