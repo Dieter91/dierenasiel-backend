@@ -89,9 +89,13 @@ class PostController extends Controller
     public function destroy($id)
     {
         $post = Post::find($id);
-        $imagePath = public_path('storage\\' . $post->img);
+        $imagePath = public_path($post->img);
         File::delete($imagePath);
-        // $post->delete();
-        return 'success';
+        $result = $post->delete();
+        if ($result) {
+            return response()->json(['success' => true]);
+        } else {
+            return response()->json(['success' => false]);
+        }
     }
 }
