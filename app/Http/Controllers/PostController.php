@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\File;
 
 class PostController extends Controller
@@ -75,9 +76,42 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $slug)
     {
-        //
+        $post = Post::where('slug', $slug)->first();
+
+        $request->validate([
+            'title' => 'required',
+            'slug' => [
+                'required',
+                'alpha_dash',
+                Rule::unique('posts')->ignore($post->id)
+            ],
+            'content' => 'required',
+            'img' => 'image'
+        ]);
+
+
+        $imagePath = public_path($post->img);
+
+        if (File::exists($imagePath)) {
+            file::delete($imagePath);
+        }
+
+
+
+        $post->title = $request->title;
+        $post->slug = $request->slug;
+        $post->title = $request->title;
+        $post->content = $request->content;
+        $post->img = 'storage/' . $request->file('img')->store('posts', 'public');
+        $result = $post->save();
+
+        if ($result) {
+            return response()->json(['success' => true]);
+        } else {
+            return response()->json(['success' => false]);
+        }
     }
 
     /**
