@@ -29,6 +29,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::put('/posts/{slug}', [PostController::class, 'update']);
     //ANIMALS
     Route::post('/animal', [AnimalController::class, 'store']);
+    Route::put('/animal/{slug}', [AnimalController::class, 'update']);
+    Route::delete('/animal/{id}', [AnimalController::class, 'destroy']);
     //AUTH
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/register', [AuthController::class, 'register']);
@@ -41,8 +43,7 @@ Route::get('/posts', [PostController::class, 'index']);
 Route::get('/posts/{slug}', [PostController::class, 'show']);
 
 //ANIMAL ROUTES
-Route::get('/animal', [AnimalController::class, 'index']);
-
+Route::get('/animal/{type}', [AnimalController::class, 'index']);
 
 //AUTH ROUTES
 Route::post('/login', [AuthController::class, 'login']);

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Animal;
 use App\Http\Requests\UpdateAnimalRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 
 
 
@@ -16,9 +17,9 @@ class AnimalController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($type)
     {
-        return Animal::all();
+        return Animal::where('type', $type)->get();
     }
 
     /**
@@ -39,7 +40,7 @@ class AnimalController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|alpha',
+            'name' => 'required|regex:/^[\pL\s\-]+$/u',
             'type' => 'required|alpha',
             'sex' => 'required|alpha',
             'breed' => 'required|regex:/^[\pL\s\-]+$/u',
@@ -104,9 +105,51 @@ class AnimalController extends Controller
      * @param  \App\Models\Animal  $animal
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateAnimalRequest $request, Animal $animal)
+    public function update(Request $request, $slug)
     {
-        //
+        $animal = Animal::where('slug', $slug)->first();
+
+        $request->validate([
+            'name' => 'required|regex:/^[\pL\s\-]+$/u',
+            'type' => 'required|alpha',
+            'sex' => 'required|alpha',
+            'breed' => 'required|regex:/^[\pL\s\-]+$/u',
+            'age' => 'integer',
+            'slug' => 'required|alpha_dash|unique:animals',
+            'childFriendly' => 'required',
+            'dogFriendly' => 'required',
+            'catFriendly' => 'required',
+            'content' => 'required',
+            'img' => 'required|image'
+        ]);
+
+
+        $imagePath = public_path($animal->img);
+
+        if (File::exists($imagePath)) {
+            file::delete($imagePath);
+        }
+
+
+
+        $animal->name = $request->name;
+        $animal->slug = $request->slug;
+        $animal->type = $request->type;
+        $animal->sex = $request->sex;
+        $animal->breed = $request->breed;
+        $animal->age = $request->age;
+        $animal->childFriendly = $request->childFriendly;
+        $animal->dogFriendly = $request->dogFriendly;
+        $animal->catFriendly = $request->catFriendly;
+        $animal->content = $request->content;
+        $animal->img = 'storage/' . $request->file('img')->store('animals', 'public');
+        $result = $animal->save();
+
+        if ($result) {
+            return response()->json(['success' => true]);
+        } else {
+            return response()->json(['success' => false]);
+        }
     }
 
     /**
@@ -115,8 +158,16 @@ class AnimalController extends Controller
      * @param  \App\Models\Animal  $animal
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Animal $animal)
+    public function destroy($id)
     {
-        //
+        $animal = Animal::find($id);
+        $imagePath = public_path($animal->img);
+        File::delete($imagePath);
+        $result = $animal->delete();
+        if ($result) {
+            return response()->json(['success' => true]);
+        } else {
+            return response()->json(['success' => false]);
+        }
     }
 }
