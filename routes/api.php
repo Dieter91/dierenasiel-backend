@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\AnimalController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,8 +27,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/posts', [PostController::class, 'store']);
     Route::delete('/posts/{id}', [PostController::class, 'destroy']);
     Route::put('/posts/{slug}', [PostController::class, 'update']);
+    //ANIMALS
+    Route::post('/animal', [AnimalController::class, 'store']);
     //AUTH
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/register', [AuthController::class, 'register']);
 });
 
 //public routes
@@ -36,6 +40,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 Route::get('/posts', [PostController::class, 'index']);
 Route::get('/posts/{slug}', [PostController::class, 'show']);
 
+//ANIMAL ROUTES
+Route::get('/animal', [AnimalController::class, 'index']);
+
+
 //AUTH ROUTES
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/register', [AuthController::class, 'register']);
