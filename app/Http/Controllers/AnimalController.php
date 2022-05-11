@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Animal;
-use App\Http\Requests\UpdateAnimalRequest;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\File;
+use App\Http\Requests\UpdateAnimalRequest;
 
 
 
@@ -82,9 +83,9 @@ class AnimalController extends Controller
      * @param  \App\Models\Animal  $animal
      * @return \Illuminate\Http\Response
      */
-    public function show(Animal $animal)
+    public function show($slug)
     {
-        //
+        return Animal::where('slug', $slug)->first();
     }
 
     /**
@@ -101,8 +102,8 @@ class AnimalController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \App\Http\Requests\UpdateAnimalRequest  $request
-     * @param  \App\Models\Animal  $animal
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $slug)
@@ -115,10 +116,14 @@ class AnimalController extends Controller
             'sex' => 'required|alpha',
             'breed' => 'required|regex:/^[\pL\s\-]+$/u',
             'age' => 'integer',
-            'slug' => 'required|alpha_dash|unique:animals',
+            'slug' => [
+                'required',
+                'alpha_dash',
+                Rule::unique('animals')->ignore($animal->id)
+            ],
             'childFriendly' => 'required',
             'dogFriendly' => 'required',
-            'catFriendly' => 'required',
+            'CatFriendly' => 'required',
             'content' => 'required',
             'img' => 'required|image'
         ]);
@@ -127,7 +132,7 @@ class AnimalController extends Controller
         $imagePath = public_path($animal->img);
 
         if (File::exists($imagePath)) {
-            file::delete($imagePath);
+            File::delete($imagePath);
         }
 
 
@@ -140,7 +145,7 @@ class AnimalController extends Controller
         $animal->age = $request->age;
         $animal->childFriendly = $request->childFriendly;
         $animal->dogFriendly = $request->dogFriendly;
-        $animal->catFriendly = $request->catFriendly;
+        $animal->CatFriendly = $request->CatFriendly;
         $animal->content = $request->content;
         $animal->img = 'storage/' . $request->file('img')->store('animals', 'public');
         $result = $animal->save();

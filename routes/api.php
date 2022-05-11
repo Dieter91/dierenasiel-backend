@@ -44,6 +44,7 @@ Route::get('/posts/{slug}', [PostController::class, 'show']);
 
 //ANIMAL ROUTES
 Route::get('/animal/{type}', [AnimalController::class, 'index']);
+Route::get('/animal/show/{slug}', [AnimalController::class, 'show']);
 
 //AUTH ROUTES
 Route::post('/login', [AuthController::class, 'login']);
